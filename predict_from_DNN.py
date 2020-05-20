@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 from tensorflow.keras.models import load_model
 from sklearn.metrics import balanced_accuracy_score, confusion_matrix
-from rswa_pipeline.data_generators import DataGeneratorAllWindows
+from data_generators.rswa_data_generator import DataGeneratorAllWindows
 
 def predict(model_name: str, path_to_model: str, path_to_data: str,
             apnea_dict_name: str, apnea_dict_path: str,
