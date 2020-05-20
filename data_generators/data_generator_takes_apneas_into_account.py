@@ -12,7 +12,7 @@ import pdb
 
 class DataGeneratorAllWindows(keras.utils.Sequence):
 
-    def __init__(self, data_path, apnea_dict_path, batch_size=128, window_size=30,
+    def __init__(self, data_path, apnea_dict_path, batch_size=128, window_size=10,
                  channel_list=["Chin", "L Leg", "R Leg"],
                  n_classes=3, stride=1, shuffle=True,
                  eps=0.5, pos_prob=0.3, mode="train"):
@@ -32,10 +32,8 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         self.batch_size = batch_size
         self.channel_list = channel_list
         self.n_channels = len(channel_list)
-        self.eps = eps
         self.n_classes = n_classes
         self.window_size = window_size
-        self.pos_prob = pos_prob
         self.shuffle = True if mode != "test" else False
         self.DOWNSAMPLED_RATE = 10
         self.data_format = None
@@ -163,7 +161,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         for i, v in enumerate(y):
             if v.sum() != 1:
                 print(i, v)
-        assert np.allclose(y.sum(1), np.ones(len(y))), f"{ID} labels do not all sum to 1"
+        assert np.allclose(y.sum(1), np.ones(len(y))), f"labels do not all sum to 1"
 
 
     def count_events(self, event_type=None):
@@ -186,6 +184,12 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
     def __getitem__(self, index):
         """Generate one batch of data which is a single REM subsequence in this case"""
         ID = self.list_IDs[index]
+        return self.__data_generation(ID)
+    
+    def __getitem_for_ID__(self, ID):
+        """Generate one batch of data which is a single REM subsequence in this case"""
+        assert ID in self.list_IDs, f'{ID} not in list_IDs!'
+        
         return self.__data_generation(ID)
 
 
