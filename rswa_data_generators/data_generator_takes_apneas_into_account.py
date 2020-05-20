@@ -18,7 +18,6 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
                  eps=0.5, pos_prob=0.3, mode="train"):
 
         mode = mode.lower()
-        data_format = data_format.lower()
         assert mode in ["train", "cv", "val", "validation", "test"],\
             "mode must be train, test or val"
 
@@ -27,7 +26,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         if not isinstance(apnea_dict_path, Path): apnea_dict_path = Path(apnea_dict_path)
         
         with apnea_dict_path.open('rb') as fa:
-            self.apnea_dict = pickle.load(fa)
+            self.apnea_dict = pickle.load(fa)['predictions']
 
         self.data_path = data_path
         self.batch_size = batch_size
