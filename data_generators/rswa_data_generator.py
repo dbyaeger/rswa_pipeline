@@ -9,12 +9,11 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
 
     def __init__(self, data_path, apnea_dict_path, batch_size=128, window_size=10,
                  channel_list=["Chin", "L Leg", "R Leg"],
-                 n_classes=3, stride=1, shuffle=True,
-                 eps=0.5, pos_prob=0.3, mode="train"):
+                 n_classes=3, stride=1, mode="test"):
 
         mode = mode.lower()
-        assert mode in ["train", "cv", "val", "validation", "test"],\
-            "mode must be train, test or val"
+        assert mode == "test"\
+            "mode must be test"
 
         if not isinstance(data_path, Path): data_path = Path(data_path)
         
@@ -29,26 +28,14 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         self.n_channels = len(channel_list)
         self.n_classes = n_classes
         self.window_size = window_size
-        self.shuffle = True if mode != "test" else False
         self.DOWNSAMPLED_RATE = 10
-        self.data_format = None
 
         self.dim = (window_size * self.DOWNSAMPLED_RATE, self.n_channels)
 
         with data_path.joinpath("data_partition.p").open("rb") as f_in:
             partition = pickle.load(f_in)
-        if mode == "train":
-            self.list_IDs = list(partition["train"])
-        elif mode in ["cv", "val", "validation"]:
-            self.list_IDs = list(partition["val"]) if "val" in partition else list(partition["cv"])
-        else:
-            self.list_IDs = list(partition["test"])
-
-        # fail dafe incase data_partition contains files that do not exist
-        id_set = set([f.stem for f in data_path.iterdir()])
-        for ID in self.list_IDs:
-            if ID not in id_set:
-                self.list_IDs.remove(ID)
+        
+        self.list_IDs = list(partition["test"])
 
         self._filter_IDs_for_apnea()
 
@@ -239,7 +226,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
             start = int(center - window // 2)
             stop = int(center + window // 2)
 
-            if self._window_contains_apnea(apneas=apneas, center=center, window=window):
+            if self._window_contains_apnea(apneas=apneas, center=center):
                 continue
 
             # need to add 1 position (second) to start or stop if window size is odd (choosing start for now)
@@ -258,9 +245,6 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
                 out = np.array([np.hstack((signals[c][-cut:], padding)) for c in signals]).T
             else:
                 out = np.array([signals[c][start:stop] for c in signals]).T
-
-            if self.data_format == "img":
-                out = self._format_as_img(out)
 
             X[counter] = out
 
