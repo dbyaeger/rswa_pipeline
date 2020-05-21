@@ -50,7 +50,8 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
             with self.data_path.joinpath(ID + '.p').open('rb') as fh:
                 data = pickle.load(fh)
 
-            lo_orig, hi_orig = data["staging"][-1][:-1]
+            lo_orig, hi_orig, stage_type = data["staging"][-1]
+            assert stage_type == 'R', f'stage type is not R but {stage_type}!'
             #print(f'data["staging"][-1][:-1]: {data["staging"][-1][:-1]}')
             #print(f'Length in epochs = ({hi_orig} - {lo_orig} + 1)*30 = {(hi_orig - lo_orig + 1)*30}')
             start_epoch = lo_orig//30
@@ -205,6 +206,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         end_epoch = hi_orig//30
         subseq_epochs = np.arange(start_epoch,end_epoch+1)
         print(f'Epochs in subsequence: {subseq_epochs}')
+        print(f'Length of subsequence: {hi_orig - lo_orig}')
         
         # get apneas in units of epochs
         sleeper_ID = ID.split('_')[0]
@@ -227,6 +229,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
 
         lo = 0
         hi = len(signals["Chin"])
+        print(f'Orginal length of signal: {hi}')
         window = self.window_size * self.DOWNSAMPLED_RATE
         #offset = 5 * self.DOWNSAMPLED_RATE
         offset = 0
@@ -238,8 +241,8 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
             length = length - len(apnea_epochs)*30*self.DOWNSAMPLED_RATE
             assert length < hi, 'Length did not change even though apnea epochs found!'
         
-        print(f'Length of signal: {length}')
-        print(f'Length of signal in epochs: {length//(30*self.DOWNSAMPLED_RATE)}')
+        print(f'Length of signal after filter: {length}')
+        print(f'Length of signal in epochs after filter: {length//(30*self.DOWNSAMPLED_RATE)}')
         X = np.zeros((length, *self.dim), dtype=np.float32)
         y = np.zeros((length, self.n_classes))
         # labels = np.empty((hi, self.n_channels), dtype=np.float32)
