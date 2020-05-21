@@ -235,10 +235,10 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         length = hi
         
         if apnea_epochs:
-            for (e_start, e_end) in apneas:
-                length -= (e_start - e_end)
+            length = length - len(apnea_epochs)*30*self.DOWNSAMPLED_RATE
             assert length < hi, 'Length did not change even though apnea epochs found!'
-            
+        
+        print(f'Length of signal: {length}')
         print(f'Length of signal in epochs: {length//(30*self.DOWNSAMPLED_RATE)}')
         X = np.zeros((length, *self.dim), dtype=np.float32)
         y = np.zeros((length, self.n_classes))
