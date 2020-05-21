@@ -53,11 +53,14 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
             end_epoch = hi_orig//30
 
             apnea_free_epochs = []
+            
+            # IDs are in the format sleeperID_subsequence
+            sleeper_ID = ID.split('_')[0]
 
             for epoch in range(start_epoch, end_epoch + 1):
-                for epoch in self.apnea_dict[ID]:
+                for epoch in self.apnea_dict[sleeper_ID]:
                     apnea_free_epoch = True
-                    if self.apnea_dict[ID][epoch] == 'A/H':
+                    if self.apnea_dict[sleeper_ID][epoch] == 'A/H':
                         apnea_free_epoch = False
                 apnea_free_epochs.append(apnea_free_epoch)
 
@@ -193,7 +196,8 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         signals = data["signals"]
         
         # get apneas in units of epochs
-        apnea_epochs = [epoch for epoch in self.apnea_dict[ID] if self.apnea_dict[ID][epoch] == 'A/H']
+        sleeper_ID = ID.split('_')[0]
+        apnea_epochs = [epoch for epoch in self.apnea_dict[sleeper_ID] if self.apnea_dict[sleeper_ID][epoch] == 'A/H']
         
         # convert apneas to units of indices
         apneas = [((epoch-1)*30*self.DOWNSAMPLED_RATE, \

@@ -19,7 +19,11 @@ def predict(model_name: str, path_to_model: str, path_to_data: str,
     """Loads the trials object and finds the model with the lowest loss. Loads
     the corresponding trained model and evaluates it over every model in the 
     test set, saving a dictionary of dictionaries keyed by ID with predictions, 
-    true labels, confusion matrix, and balanced accuracy."""
+    true labels, confusion matrix, and balanced accuracy. BE AWARE that balanced
+    accuracy, true labels, and confusion matrix are generated only for epochs
+    THAT HAVE BEEN LABELED AS REM AND APNEA-FREE by the corresponding labels
+    provided. IF LABELS ARE WRONG, BALANCED ACCURACY AND CONFUSION MATRIX WILL
+    BE MISLEADING!!!!!!"""
 
     # Load the model
     if not isinstance(path_to_model, Path):
