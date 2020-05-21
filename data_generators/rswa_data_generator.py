@@ -44,6 +44,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
     def _filter_IDs_for_apnea(self, EPOCH_LEN = 30):
         """Removes IDs that are entirely apneic/hypopneic"""
         IDs_copy = self.list_IDs.copy()
+        self.apnea_free_rem_epochs = {}
         
         for ID in IDs_copy:
             with self.data_path.joinpath(ID + '.p').open('rb') as fh:
@@ -52,7 +53,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
             lo_orig, hi_orig = data["staging"][-1][:-1]
             start_epoch = lo_orig//30
             end_epoch = hi_orig//30
-
+            self.apnea_free_rem_epochs[ID] = []
             apnea_free_epochs = []
             
             # IDs are in the format sleeperID_subsequence
@@ -63,6 +64,8 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
                     apnea_free_epoch = True
                     if self.apnea_dict[sleeper_ID][epoch] == 'A/H':
                         apnea_free_epoch = False
+                    if apnea_free_epoch:
+                        self.apnea_free_rem_epochs[ID].append(epoch)
                 apnea_free_epochs.append(apnea_free_epoch)
 
             # Remove ID if all epochs are apnea/hypopnea
@@ -218,8 +221,6 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
                                        downsampled_rate = self.DOWNSAMPLED_RATE)
 
         signals = {c:self._featurize(signals[c][-(hi_orig - lo_orig):].ravel(), c) for c in self.channel_list}
-        for sig in signals:
-            print('Length of signal {sig}: {length(signals[sig])}')
 
         lo = 0
         hi = len(signals["Chin"])
@@ -233,7 +234,8 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         if apnea_epochs:
             for (e_start, e_end) in apneas:
                 length -= (e_start - e_end)
-
+            
+        print(f'Length of signal in epochs: {length//(30*self.DOWNSAMPLED_RATE)}')
         X = np.zeros((length, *self.dim), dtype=np.float32)
         y = np.zeros((length, self.n_classes))
         # labels = np.empty((hi, self.n_channels), dtype=np.float32)
