@@ -30,7 +30,7 @@ def predict(model_name: str, path_to_model: str, path_to_data: str,
     
     apnea_dict_path = apnea_dict_path.joinpath(apnea_dict_name)
     
-    model_path = str(path_to_model.joinpath(f'model_name'))
+    model_path = str(path_to_model.joinpath(model_name))
     
     model = load_model(model_path)
     

@@ -12,8 +12,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
                  n_classes=3, stride=1, mode="test"):
 
         mode = mode.lower()
-        assert mode == "test"\
-            "mode must be test"
+        assert mode == "test", "mode must be test"
 
         if not isinstance(data_path, Path): data_path = Path(data_path)
         
