@@ -203,10 +203,12 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         # convert apneas to units of indices
         apneas = [((epoch-1)*30*self.DOWNSAMPLED_RATE, \
                    epoch*30*self.DOWNSAMPLED_RATE) for epoch in apnea_epochs]
+        print(f'apneas: {apneas}')
 
         lo_orig, hi_orig = data["staging"][-1][:-1]
         events = self._time_to_indices(event_list=events, start=lo_orig, end=hi_orig,
                                        downsampled_rate = self.DOWNSAMPLED_RATE)
+        print(f'start: {lo_orig}\t stop: {hi_orig}')
 
         signals = {c:self._featurize(signals[c][-(hi_orig - lo_orig):].ravel(), c) for c in self.channel_list}
 
