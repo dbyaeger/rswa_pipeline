@@ -73,6 +73,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
 
             # Remove ID if all epochs are apnea/hypopnea
             if not any(apnea_free_epochs):
+                print('Removing {ID}')
                 self.list_IDs.remove(ID)
                 
     @staticmethod
@@ -219,8 +220,8 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         
         # convert apneas to units of indices. Have to subtract first rem epoch
         if apnea_epochs:
-            apneas = [((epoch-1-subseq_epochs[0])*30*self.DOWNSAMPLED_RATE, \
-                       (epoch-subseq_epochs[0])*30*self.DOWNSAMPLED_RATE) for epoch in apnea_epochs]
+            apneas = [((epoch-subseq_epochs[0])*30*self.DOWNSAMPLED_RATE, \
+                       (epoch-subseq_epochs[0] + 1)*30*self.DOWNSAMPLED_RATE) for epoch in apnea_epochs]
             
             print(f'apneas: {apneas}')
         
@@ -245,6 +246,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         
         print(f'Length of signal after filter: {length}')
         print(f'Length of signal in epochs after filter: {length//(30*self.DOWNSAMPLED_RATE)}')
+        assert length > 0, 'Length is zero! {self.apnea_free_rem_epochs[ID]}'
         X = np.zeros((length, *self.dim), dtype=np.float32)
         y = np.zeros((length, self.n_classes))
         # labels = np.empty((hi, self.n_channels), dtype=np.float32)
