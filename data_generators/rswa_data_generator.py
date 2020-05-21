@@ -63,12 +63,11 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
             sleeper_ID = ID.split('_')[0]
 
             for epoch in range(start_epoch, end_epoch):
-                for epoch in self.apnea_dict[sleeper_ID]:
-                    apnea_free_epoch = True
-                    if self.apnea_dict[sleeper_ID][epoch] == 'A/H':
-                        apnea_free_epoch = False
-                    if apnea_free_epoch:
-                        self.apnea_free_rem_epochs[ID].append(epoch)
+                apnea_free_epoch = True
+                if self.apnea_dict[sleeper_ID][epoch] == 'A/H':
+                    apnea_free_epoch = False
+                if apnea_free_epoch:
+                    self.apnea_free_rem_epochs[ID].append(epoch)
                 apnea_free_epochs.append(apnea_free_epoch)
 
             # Remove ID if all epochs are apnea/hypopnea
