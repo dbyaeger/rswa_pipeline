@@ -217,8 +217,8 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
 
         # Calculate length
         length = hi
-        for (e_start, e_end, e_type) in apneas:
-            length -= (e_start - e_end + 1)
+        for (e_start, e_end) in apneas:
+            length -= (e_start - e_end)
 
         X = np.zeros((length, *self.dim), dtype=np.float32)
         y = np.zeros((length, self.n_classes))

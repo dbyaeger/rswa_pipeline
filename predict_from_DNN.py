@@ -40,10 +40,7 @@ def predict(model_name: str, path_to_model: str, path_to_data: str,
     
     # Set up data generator
     test_gen = DataGeneratorAllWindows(path_to_data, apnea_dict_path, 
-                                       batch_size=8, window_size=10,
-                                       channel_list=["Chin", "L Leg", "R Leg"],
-                                       n_classes=3, stride=1, shuffle=False,
-                                       mode="train")        
+                                       batch_size=8, window_size=10)        
     IDs = test_gen.list_IDs      
     test_results_dict = {ID: {} for ID in IDs}
     
@@ -52,7 +49,7 @@ def predict(model_name: str, path_to_model: str, path_to_data: str,
         if verbose:
             print(f'ID:\t{ID}')
         
-        X, y = test_gen._getitem_for_ID__(ID)
+        X, y = test_gen.__getitem_for_ID__(ID)
         y_pred = model.predict(X)
         
         y = y[:len(y_pred)]
@@ -60,15 +57,15 @@ def predict(model_name: str, path_to_model: str, path_to_data: str,
         test_results_dict[ID]['predictions'] = y_pred
         
         try:
-            test_results_dict[ID]['balanaced_accuracy'] = balanced_accuracy_score(y.argmax(-1),
+            test_results_dict[ID]['balanced_accuracy_score'] = balanced_accuracy_score(y.argmax(-1),
                                                       y_pred.argmax(-1))
         except:
-             test_results_dict[ID]['balanaced_accuracy'] = np.nan
+             test_results_dict[ID]['balanced_accuracy_score'] = np.nan
         
         test_results_dict[ID]["confusion_matrix"] = confusion_matrix(y.argmax(-1),y_pred.argmax(-1))
         
         if verbose:
-            print(f"Balanced accuracy: {test_results_dict[ID]['balanaced_accuracy']}")
+            print(f"Balanced accuracy: {test_results_dict[ID]['balanced_accuracy_score']}")
     
     if not isinstance(save_path, Path): save_path = Path(save_path)
     
@@ -79,6 +76,7 @@ def predict(model_name: str, path_to_model: str, path_to_data: str,
     
     with save_path.open('wb') as fh:
         pickle.dump(test_results_dict, fh)
+
 
         
         
