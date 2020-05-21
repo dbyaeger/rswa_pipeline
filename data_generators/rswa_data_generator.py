@@ -63,7 +63,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
             sleeper_ID = ID.split('_')[0]
 
             for epoch in range(start_epoch, end_epoch):
-                assert epoch in self.apnea_dict['predictions'][sleeper_ID], f"epoch {epoch} not in apnea_dict for {sleeper_ID} with max_epoch: {max(list(self.apnea_dict['predictions'][sleeper_ID].keys()))}!"
+                assert epoch in self.apnea_dict[sleeper_ID], f"epoch {epoch} not in apnea_dict for {sleeper_ID} with max_epoch: {max(list(self.apnea_dict[sleeper_ID].keys()))}!"
                 apnea_free_epoch = True
                 if self.apnea_dict[sleeper_ID][epoch] == 'A/H':
                     apnea_free_epoch = False
