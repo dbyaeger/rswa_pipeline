@@ -195,17 +195,23 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         self.DOWNSAMPLED_RATE = 10
         events = data["rswa_events"]
         signals = data["signals"]
+        lo_orig, hi_orig = data["staging"][-1][:-1]
+        start_epoch = lo_orig//30
+        end_epoch = hi_orig//30
+        subseq_epochs = np.arange(start_epoch,end_epoch+1)
         
         # get apneas in units of epochs
         sleeper_ID = ID.split('_')[0]
-        apnea_epochs = [epoch for epoch in self.apnea_dict[sleeper_ID] if self.apnea_dict[sleeper_ID][epoch] == 'A/H']
+        apnea_epochs = [epoch for epoch in self.apnea_dict[sleeper_ID] if \
+                        self.apnea_dict[sleeper_ID][epoch] == 'A/H' and \
+                        epoch in subseq_epochs]
         
         # convert apneas to units of indices
         apneas = [((epoch-1)*30*self.DOWNSAMPLED_RATE, \
                    epoch*30*self.DOWNSAMPLED_RATE) for epoch in apnea_epochs]
-        print(f'apneas: {apneas}')
+        
 
-        lo_orig, hi_orig = data["staging"][-1][:-1]
+        
         events = self._time_to_indices(event_list=events, start=lo_orig, end=hi_orig,
                                        downsampled_rate = self.DOWNSAMPLED_RATE)
         print(f'start: {lo_orig}\t stop: {hi_orig}')
