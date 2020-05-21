@@ -28,7 +28,8 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         self.n_classes = n_classes
         self.window_size = window_size
         self.DOWNSAMPLED_RATE = 10
-
+        self.eps = 0.5
+        
         self.dim = (window_size * self.DOWNSAMPLED_RATE, self.n_channels)
 
         with data_path.joinpath("data_partition.p").open("rb") as f_in:
