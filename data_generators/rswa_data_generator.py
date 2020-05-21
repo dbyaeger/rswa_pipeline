@@ -210,15 +210,16 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         
         
         # convert apneas to units of indices
-        apneas = [((epoch-1)*30*self.DOWNSAMPLED_RATE, \
-                   epoch*30*self.DOWNSAMPLED_RATE) for epoch in apnea_epochs]
-        
-
+        if apnea_epochs:
+            apneas = [((epoch-1)*30*self.DOWNSAMPLED_RATE, \
+                       epoch*30*self.DOWNSAMPLED_RATE) for epoch in apnea_epochs]
         
         events = self._time_to_indices(event_list=events, start=lo_orig, end=hi_orig,
                                        downsampled_rate = self.DOWNSAMPLED_RATE)
 
         signals = {c:self._featurize(signals[c][-(hi_orig - lo_orig):].ravel(), c) for c in self.channel_list}
+        for sig in signals:
+            print('Length of signal {sig}: {length(signals[sig])}')
 
         lo = 0
         hi = len(signals["Chin"])
@@ -228,8 +229,10 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
 
         # Calculate length
         length = hi
-        for (e_start, e_end) in apneas:
-            length -= (e_start - e_end)
+        
+        if apnea_epochs:
+            for (e_start, e_end) in apneas:
+                length -= (e_start - e_end)
 
         X = np.zeros((length, *self.dim), dtype=np.float32)
         y = np.zeros((length, self.n_classes))
@@ -239,9 +242,10 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         for center in range(offset, hi - offset):
             start = int(center - window // 2)
             stop = int(center + window // 2)
-
-            if self._window_contains_apnea(apneas=apneas, center=center):
-                continue
+            
+            if apnea_epochs:
+                if self._window_contains_apnea(apneas=apneas, center=center):
+                    continue
 
             # need to add 1 position (second) to start or stop if window size is odd (choosing start for now)
             if self.window_size % 2 != 0:
@@ -265,6 +269,8 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
             y[counter] = self._create_label(center, events)
 
             counter += 1
-
-        return X[offset:-offset], y[offset:-offset]
+        
+        if offset > 0:
+            return X[offset:-offset], y[offset:-offset]
+        return X, y
 
