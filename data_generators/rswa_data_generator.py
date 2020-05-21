@@ -199,12 +199,15 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         start_epoch = lo_orig//30
         end_epoch = hi_orig//30
         subseq_epochs = np.arange(start_epoch,end_epoch+1)
+        print(f'Epochs in subsequence: {subseq_epochs}')
         
         # get apneas in units of epochs
         sleeper_ID = ID.split('_')[0]
         apnea_epochs = [epoch for epoch in self.apnea_dict[sleeper_ID] if \
                         self.apnea_dict[sleeper_ID][epoch] == 'A/H' and \
                         epoch in subseq_epochs]
+        print(f'Apnea Epochs in subseq: {apnea_epochs}')
+        
         
         # convert apneas to units of indices
         apneas = [((epoch-1)*30*self.DOWNSAMPLED_RATE, \
@@ -214,7 +217,6 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         
         events = self._time_to_indices(event_list=events, start=lo_orig, end=hi_orig,
                                        downsampled_rate = self.DOWNSAMPLED_RATE)
-        print(f'start: {lo_orig}\t stop: {hi_orig}')
 
         signals = {c:self._featurize(signals[c][-(hi_orig - lo_orig):].ravel(), c) for c in self.channel_list}
 
