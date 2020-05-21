@@ -51,6 +51,8 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
                 data = pickle.load(fh)
 
             lo_orig, hi_orig = data["staging"][-1][:-1]
+            print(f'data["staging"][-1][:-1]: {data["staging"][-1][:-1]}')
+            print(f'Length in epochs = ({hi_orig} - {lo_orig} + 1)*30 = {(hi_orig - lo_orig + 1)*30}')
             start_epoch = lo_orig//30
             end_epoch = hi_orig//30
             self.apnea_free_rem_epochs[ID] = []
@@ -234,6 +236,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         if apnea_epochs:
             for (e_start, e_end) in apneas:
                 length -= (e_start - e_end)
+                assert 
             
         print(f'Length of signal in epochs: {length//(30*self.DOWNSAMPLED_RATE)}')
         X = np.zeros((length, *self.dim), dtype=np.float32)
