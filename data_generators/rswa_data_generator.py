@@ -62,7 +62,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
             # IDs are in the format sleeperID_subsequence
             sleeper_ID = ID.split('_')[0]
 
-            for epoch in range(start_epoch, end_epoch + 1):
+            for epoch in range(start_epoch, end_epoch):
                 for epoch in self.apnea_dict[sleeper_ID]:
                     apnea_free_epoch = True
                     if self.apnea_dict[sleeper_ID][epoch] == 'A/H':
@@ -204,7 +204,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         lo_orig, hi_orig = data["staging"][-1][:-1]
         start_epoch = lo_orig//30
         end_epoch = hi_orig//30
-        subseq_epochs = np.arange(start_epoch,end_epoch+1)
+        subseq_epochs = np.arange(start_epoch,end_epoch)
         print(f'Epochs in subsequence: {subseq_epochs}')
         print(f'Number of epochs in subsequence: {len(subseq_epochs)}')
         print(f'Length of subsequence: {hi_orig - lo_orig}')
@@ -217,10 +217,10 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         print(f'Apnea Epochs in subseq: {apnea_epochs}')
         
         
-        # convert apneas to units of indices
+        # convert apneas to units of indices. Have to subtract first rem epoch
         if apnea_epochs:
-            apneas = [((epoch-1-apnea_epochs[0])*30*self.DOWNSAMPLED_RATE, \
-                       (epoch-apnea_epochs[0])*30*self.DOWNSAMPLED_RATE) for epoch in apnea_epochs]
+            apneas = [((epoch-1-subseq_epochs[0])*30*self.DOWNSAMPLED_RATE, \
+                       (epoch-subseq_epochs[0])*30*self.DOWNSAMPLED_RATE) for epoch in apnea_epochs]
             
             print(f'apneas: {apneas}')
         
