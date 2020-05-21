@@ -206,6 +206,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         end_epoch = hi_orig//30
         subseq_epochs = np.arange(start_epoch,end_epoch+1)
         print(f'Epochs in subsequence: {subseq_epochs}')
+        print(f'Number of epochs in subsequence: {len(subseq_epochs)}')
         print(f'Length of subsequence: {hi_orig - lo_orig}')
         
         # get apneas in units of epochs
@@ -218,8 +219,9 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         
         # convert apneas to units of indices
         if apnea_epochs:
-            apneas = [((epoch-1)*30*self.DOWNSAMPLED_RATE, \
-                       epoch*30*self.DOWNSAMPLED_RATE) for epoch in apnea_epochs]
+            apneas = [((epoch-1-apnea_epochs[0])*30*self.DOWNSAMPLED_RATE, \
+                       (epoch-apnea_epochs[0])*30*self.DOWNSAMPLED_RATE) for epoch in apnea_epochs]
+            
             print(f'apneas: {apneas}')
         
         events = self._time_to_indices(event_list=events, start=lo_orig, end=hi_orig,
