@@ -55,7 +55,9 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
             apnea_free_epochs = []
             
             # IDs are in the format sleeperID_subsequence
+            print('ID: {ID}')
             sleeper_ID = ID.split('_')[0]
+            print('sleeper_ID = {sleeper_ID}')
 
             for epoch in range(start_epoch, end_epoch + 1):
                 for epoch in self.apnea_dict[sleeper_ID]:
