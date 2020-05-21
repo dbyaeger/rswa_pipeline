@@ -73,8 +73,8 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
 
             # Remove ID if all epochs are apnea/hypopnea
             if not any(apnea_free_epochs):
-                print('Removing {ID}')
                 self.list_IDs.remove(ID)
+                print(f'Removing {ID}')
                 
     @staticmethod
     def _featurize(x, channel):
@@ -246,7 +246,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         
         print(f'Length of signal after filter: {length}')
         print(f'Length of signal in epochs after filter: {length//(30*self.DOWNSAMPLED_RATE)}')
-        assert length > 0, 'Length is zero! {self.apnea_free_rem_epochs[ID]}'
+        assert length > 0, f'Length is zero! {self.apnea_free_rem_epochs[ID]}'
         X = np.zeros((length, *self.dim), dtype=np.float32)
         y = np.zeros((length, self.n_classes))
         # labels = np.empty((hi, self.n_channels), dtype=np.float32)
