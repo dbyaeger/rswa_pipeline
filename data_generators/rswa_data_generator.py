@@ -51,8 +51,8 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
                 data = pickle.load(fh)
 
             lo_orig, hi_orig = data["staging"][-1][:-1]
-            print(f'data["staging"][-1][:-1]: {data["staging"][-1][:-1]}')
-            print(f'Length in epochs = ({hi_orig} - {lo_orig} + 1)*30 = {(hi_orig - lo_orig + 1)*30}')
+            #print(f'data["staging"][-1][:-1]: {data["staging"][-1][:-1]}')
+            #print(f'Length in epochs = ({hi_orig} - {lo_orig} + 1)*30 = {(hi_orig - lo_orig + 1)*30}')
             start_epoch = lo_orig//30
             end_epoch = hi_orig//30
             self.apnea_free_rem_epochs[ID] = []
@@ -218,6 +218,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         if apnea_epochs:
             apneas = [((epoch-1)*30*self.DOWNSAMPLED_RATE, \
                        epoch*30*self.DOWNSAMPLED_RATE) for epoch in apnea_epochs]
+            print(f'apneas: {apneas}')
         
         events = self._time_to_indices(event_list=events, start=lo_orig, end=hi_orig,
                                        downsampled_rate = self.DOWNSAMPLED_RATE)
