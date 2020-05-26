@@ -15,15 +15,11 @@ from data_generators.rswa_data_generator import DataGeneratorAllWindows
 def predict(model_name: str, path_to_model: str, path_to_data: str,
             apnea_dict_name: str, apnea_dict_path: str,
             save_path: str, save_name: str = None,
-            verbose: bool = True):
+            verbose: bool = True, evaluate: bool = True):
     """Loads the trials object and finds the model with the lowest loss. Loads
     the corresponding trained model and evaluates it over every model in the 
-    test set, saving a dictionary of dictionaries keyed by ID with predictions, 
-    true labels, confusion matrix, and balanced accuracy. BE AWARE that balanced
-    accuracy, true labels, and confusion matrix are generated only for epochs
-    THAT HAVE BEEN LABELED AS REM AND APNEA-FREE by the corresponding labels
-    provided. IF LABELS ARE WRONG, BALANCED ACCURACY AND CONFUSION MATRIX WILL
-    BE MISLEADING!!!!!!"""
+    test set, saving a dictionary of dictionaries keyed by ID with predictions. 
+    """
 
     # Load the model
     if not isinstance(path_to_model, Path):
@@ -40,10 +36,12 @@ def predict(model_name: str, path_to_model: str, path_to_data: str,
     
     # Set up data generator
     test_gen = DataGeneratorAllWindows(path_to_data, apnea_dict_path, 
-                                       batch_size=8, window_size=10)        
+                                       batch_size=1, window_size=10)        
     IDs = test_gen.list_IDs      
-    test_results_dict = {ID: {} for ID in IDs}
-    
+    test_results_dict = {}
+
+    evaluations = []
+
     # iterate over IDs and generate predictions
     for ID in IDs:
         if verbose:
@@ -52,32 +50,24 @@ def predict(model_name: str, path_to_model: str, path_to_data: str,
         X, y = test_gen.__getitem_for_ID__(ID)
         y_pred = model.predict(X)
         
-        y = y[:len(y_pred)]
-        test_results_dict[ID]['targets'] = y
-        test_results_dict[ID]['predictions'] = y_pred
-        
-        try:
-            test_results_dict[ID]['balanced_accuracy_score'] = balanced_accuracy_score(y.argmax(-1),
-                                                      y_pred.argmax(-1))
-        except:
-             test_results_dict[ID]['balanced_accuracy_score'] = np.nan
-        
-        test_results_dict[ID]["confusion_matrix"] = confusion_matrix(y.argmax(-1),y_pred.argmax(-1))
-        
-        if verbose:
-            print(f"Balanced accuracy: {test_results_dict[ID]['balanced_accuracy_score']}")
+        test_results_dict[ID] = y_pred
+
+        if evaluate:
+          evaluations.append(balanced_accuracy_score(y.argmax(-1),y_pred.argmax(-1)))
+
     
     if not isinstance(save_path, Path): save_path = Path(save_path)
     
     if save_name is not None:
         save_path = save_path.joinpath(save_name)
     else:
-        save_path = save_path.joinpath(f'{model_name}_using_{apnea_dict_name}.p')
+        save_path = save_path.joinpath(f'{model_name}_using_{apnea_dict_name}')
     
     with save_path.open('wb') as fh:
         pickle.dump(test_results_dict, fh)
-
-
+    
+    if evaluate:
+      print(f'Mean balanced accuracy: {np.mean(evaluations)} +/- {np.std(evaluations)}')
         
         
         

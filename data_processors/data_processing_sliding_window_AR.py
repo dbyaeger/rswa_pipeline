@@ -23,7 +23,7 @@ class DataProcessor:
 
     def __init__(self, input_path, output_path, channel_list=["Chin", "L Leg", "R Leg"], 
                  min_time_hours=4, min_rem_epochs=10, min_rem_subsequence_len=1,
-                 artifact_reduce=True, 
+                 artifact_reduce=False, 
                  path_to_polysmith_db = '/Users/danielyaeger/Documents/Modules/sleep-research-ml/data/supplemental/Polysmith_DataBase_ML_forPhil.csv',):
         """
         Takes in xdf and nkamp files corresponding to one complete study and writes
@@ -106,7 +106,7 @@ class DataProcessor:
             return
         
         # Check if last epoch complete
-        end_time, sampling_rate = signal_dict[self.channel_list[0]].shape[0]
+        end_time, sampling_rate = signal_dict[self.channel_list[0]].shape
         
         # split study, restrict to 60 minutes before cpap machine turned on
         if ID in self.split_studies:
@@ -366,7 +366,7 @@ class DataProcessor:
 if __name__ == "__main__":
     data_path = "/Volumes/TOSHIBA EXT/training_data"
 
-    output_path = "/Users/danielyaeger/Documents/NO_artifact_reduced_emg"
+    output_path = "/Users/danielyaeger/Documents/NO_artifact_reduced_emg2"
 
     data_processor = DataProcessor(data_path,output_path)
     data_processor.process_data()

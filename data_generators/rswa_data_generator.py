@@ -19,7 +19,12 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         if not isinstance(apnea_dict_path, Path): apnea_dict_path = Path(apnea_dict_path)
         
         with apnea_dict_path.open('rb') as fa:
-            self.apnea_dict = pickle.load(fa)['predictions']
+              self.apnea_dict = pickle.load(fa)
+        
+        try:
+          self.apnea_dict = self.apnea_dict['predictions']
+        except:
+          pass
 
         self.data_path = data_path
         self.batch_size = batch_size
@@ -58,6 +63,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
             end_epoch = hi_orig//30
             self.apnea_free_rem_epochs[ID] = []
             apnea_free_epochs = []
+            self.removed_IDs = []
             
             # IDs are in the format sleeperID_subsequence
             sleeper_ID = ID.split('_')[0]
@@ -74,7 +80,8 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
             # Remove ID if all epochs are apnea/hypopnea
             if not any(apnea_free_epochs):
                 self.list_IDs.remove(ID)
-                print(f'Removing {ID}')
+                self.removed_IDs.append(ID)
+                #print(f'Removing {ID}')
                 
     @staticmethod
     def _featurize(x, channel):
@@ -206,16 +213,16 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         start_epoch = lo_orig//30
         end_epoch = hi_orig//30
         subseq_epochs = np.arange(start_epoch,end_epoch)
-        print(f'Epochs in subsequence: {subseq_epochs}')
-        print(f'Number of epochs in subsequence: {len(subseq_epochs)}')
-        print(f'Length of subsequence: {hi_orig - lo_orig}')
+        #print(f'Epochs in subsequence: {subseq_epochs}')
+        #print(f'Number of epochs in subsequence: {len(subseq_epochs)}')
+        #print(f'Length of subsequence: {hi_orig - lo_orig}')
         
         # get apneas in units of epochs
         sleeper_ID = ID.split('_')[0]
         apnea_epochs = [epoch for epoch in self.apnea_dict[sleeper_ID] if \
                         self.apnea_dict[sleeper_ID][epoch] == 'A/H' and \
                         epoch in subseq_epochs]
-        print(f'Apnea Epochs in subseq: {apnea_epochs}')
+        #print(f'Apnea Epochs in subseq: {apnea_epochs}')
         
         
         # convert apneas to units of indices. Have to subtract first rem epoch
@@ -223,7 +230,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
             apneas = [((epoch-subseq_epochs[0])*30*self.DOWNSAMPLED_RATE, \
                        (epoch-subseq_epochs[0] + 1)*30*self.DOWNSAMPLED_RATE) for epoch in apnea_epochs]
             
-            print(f'apneas: {apneas}')
+            #print(f'apneas: {apneas}')
         
         events = self._time_to_indices(event_list=events, start=lo_orig, end=hi_orig,
                                        downsampled_rate = self.DOWNSAMPLED_RATE)
@@ -232,7 +239,7 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
 
         lo = 0
         hi = len(signals["Chin"])
-        print(f'Orginal length of signal: {hi}')
+        #print(f'Orginal length of signal: {hi}')
         window = self.window_size * self.DOWNSAMPLED_RATE
         #offset = 5 * self.DOWNSAMPLED_RATE
         offset = 0
@@ -244,8 +251,8 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
             length = length - len(apnea_epochs)*30*self.DOWNSAMPLED_RATE
             assert length < hi, 'Length did not change even though apnea epochs found!'
         
-        print(f'Length of signal after filter: {length}')
-        print(f'Length of signal in epochs after filter: {length//(30*self.DOWNSAMPLED_RATE)}')
+        #print(f'Length of signal after filter: {length}')
+        #print(f'Length of signal in epochs after filter: {length//(30*self.DOWNSAMPLED_RATE)}')
         assert length > 0, f'Length is zero! {self.apnea_free_rem_epochs[ID]}'
         X = np.zeros((length, *self.dim), dtype=np.float32)
         y = np.zeros((length, self.n_classes))
@@ -286,4 +293,3 @@ class DataGeneratorAllWindows(keras.utils.Sequence):
         if offset > 0:
             return X[offset:-offset], y[offset:-offset]
         return X, y
-
