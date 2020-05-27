@@ -71,7 +71,7 @@ def generate_full_rswa_predictions(name_of_staging: str,
         for epoch in sorted(list(stage_dict[ID].keys())):
             if stage_dict[ID][epoch] in ['R','1','2','3']:
                 if apnea_dict[ID][epoch] == 'None':
-                    rswa_full_predictions[ID][(epoch-1)*increment:epoch*increment] = sequence_dict[ID][counter:counter + increment]
+                    rswa_full_predictions[ID][(epoch-1)*increment:epoch*increment] = sequence_dict[ID][counter:counter + increment].argmax(-1)
                     counter += increment
                     if counter >= len(sequence_dict[ID]): break
     

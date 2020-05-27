@@ -10,6 +10,10 @@ import pickle
 from pathlib import Path
 import numpy as np
 
+import pickle
+from pathlib import Path
+import numpy as np
+
 def generate_targets(name_of_ground_truth_staging: str,
                      path_to_ground_truth_staging: str,
                      name_of_ground_truth_apnea: str,
@@ -82,6 +86,10 @@ def generate_targets(name_of_ground_truth_staging: str,
         for epoch in sorted(list(stage_dict[ID].keys())):
             if stage_dict[ID][epoch] in ['R','1','2','3']:
                 if apnea_dict[ID][epoch] == 'None':
+                    #print(f'Shape of rswa_full_targets: {rswa_full_targets[ID].shape}')
+                    #print(f'Shape of sequence_dict[ID]: {sequence_dict[ID].shape}')
+                    #print(f'Counter: {counter}')
+                    #print(f'epoch*increment: {epoch*increment}')
                     rswa_full_targets[ID][(epoch-1)*increment:epoch*increment] = sequence_dict[ID][counter:counter + increment]
                     counter += increment
                     if counter >= len(sequence_dict[ID]): break
