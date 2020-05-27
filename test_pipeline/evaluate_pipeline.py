@@ -24,7 +24,7 @@ def evaluate_pipeline(prediction_configurations: list,
     # Create full-length targets if they don't exist
     if not isinstance(save_path, Path): save_path = Path(save_path)
     
-    if not save_path.joinpath('RSWA_ground_truth_full_targets.p').is_file:
+    if not save_path.joinpath('RSWA_ground_truth_full_targets.p').exists():
         print('Generating full-length RSWA targets')
         generate_full_rswa_predictions(name_of_ground_truth_staging,
                                        path_to_ground_truth_staging,
