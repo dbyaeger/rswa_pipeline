@@ -47,7 +47,8 @@ def evaluate(ground_truth_name: str, prediction_files: list, data_path: str,
                 scores.append(metric(targets[ID], preds[ID]))
             mean = round(np.mean(scores),3)
             std = round(np.std(scores), 3)
-            results[re.findall(r'function (.*) at', str(metric))[0]] = f'{mean} ± {std}'
+            metric_name = re.findall(r'function (.*) at', str(metric))[0]
+            results[metric_name].append(f'{mean} ± {std}')
     
     # Make into a dataframe and save as a .csv file
     results_df = pd.DataFrame.from_dict(results)
