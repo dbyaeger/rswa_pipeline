@@ -42,11 +42,11 @@ def evaluate(ground_truth_name: str, prediction_files: list, data_path: str,
             preds = pickle.load(fin)
         
         for metric in metrics:
-            results = []
+            scores = []
             for ID in preds:
-                results.append(metric(targets[ID], preds[ID]))
-            mean = round(np.mean(results),3)
-            std = round(np.std(results), 3)
+                scores.append(metric(targets[ID], preds[ID]))
+            mean = round(np.mean(scores),3)
+            std = round(np.std(scores), 3)
             results[re.findall(r'function (.*) at', str(metric))[0]] = f'{mean} ± {std}'
     
     # Make into a dataframe and save as a .csv file
