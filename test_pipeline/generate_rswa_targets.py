@@ -9,10 +9,8 @@ Created on Tue May 26 10:06:25 2020
 import pickle
 from pathlib import Path
 import numpy as np
+from data_generators.rswa_data_generator import DataGeneratorAllWindows
 
-import pickle
-from pathlib import Path
-import numpy as np
 
 def generate_targets(name_of_ground_truth_staging: str,
                      path_to_ground_truth_staging: str,
@@ -64,7 +62,7 @@ def generate_targets(name_of_ground_truth_staging: str,
     sequence_dict = {}
     sleeper_IDs = list(set([ID.split('_')[0] for ID in truth_gen.list_IDs]))
     for ID in sleeper_IDs:
-      print(f'ID: {ID}')
+      #print(f'ID: {ID}')
       subseq = -1
       while subseq < 1e3:
         subseq += 1
@@ -76,7 +74,7 @@ def generate_targets(name_of_ground_truth_staging: str,
         except:
           continue
     
-    print('Generating full sequences...')
+    #print('Generating full sequences...')
     rswa_full_targets = {}
     for ID in sleeper_IDs:
 
