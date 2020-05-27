@@ -8,7 +8,7 @@ Created on Tue May 26 14:55:34 2020
 from pathlib import Path
 
 from test_pipeline.evaluate import evaluate
-from test_pipeline.get_full_rswa_predictions import generate_full_rswa_predictions
+from test_pipeline.generate_rswa_targets import generate_targets
 from test_pipeline.predict_from_DNN import predict
 
 def evaluate_pipeline(prediction_configurations: list,
@@ -26,7 +26,7 @@ def evaluate_pipeline(prediction_configurations: list,
     
     if not save_path.joinpath('RSWA_ground_truth_full_targets.p').exists():
         print('Generating full-length RSWA targets')
-        generate_full_rswa_predictions(name_of_ground_truth_staging,
+        generate_targets(name_of_ground_truth_staging,
                                        path_to_ground_truth_staging,
                                        name_of_ground_truth_apnea,
                                        path_to_ground_truth_apnea,
