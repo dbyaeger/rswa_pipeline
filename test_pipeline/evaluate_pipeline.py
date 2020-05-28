@@ -66,5 +66,44 @@ def evaluate_pipeline(prediction_configurations: list,
                        metrics = metrics,
                        save_path = save_path,
                        save_name = pipeline_results_save_name)
+
+if __name__ == "__main__":
+    
+    from sklearn.metrics import balanced_accuracy_score
+    path_to_apneas = Path('/content/gdrive/My Drive/').joinpath('Apnea_Dicts')
+    prediction_configurations = [
+                      {'model_name': 'resnet_no_apnea_multi_channel_with_artifact_reduction_window_10.hdf5',
+                       'path_to_model': model_path,
+                       'path_to_data': Path('/content/gdrive/My Drive/').joinpath('Data/artifact_reduced_emg2'),
+                       'apnea_dict_name': 'ground_truth_apnea_dict.p',
+                       'apnea_dict_path': path_to_apneas,
+                       'name_of_predictions_rem_only': 'REM_human_staging_human_apnea_ml_rswa_AR.p',
+                       'save_path': Path('/content/gdrive/My Drive/').joinpath('RSWA_Predictions'),
+                       'name_of_staging': 'stage_dict.p',
+                       'path_to_staging': Path('/content/gdrive/My Drive/').joinpath('Data/raw_no_baseline_all'),
+                       'name_of_predictions_full': 'FULL_human_staging_human_apnea_ml_rswa_AR.p'
+                       },
+                      {'model_name': 'resnet_no_apnea_multi_channel_window_10.hdf5',
+                       'path_to_model': model_path,
+                       'path_to_data': Path('/content/gdrive/My Drive/').joinpath('Data/NO_artifact_reduced_emg2'),
+                       'apnea_dict_name': 'ground_truth_apnea_dict.p',
+                       'apnea_dict_path': path_to_apneas,
+                       'name_of_predictions_rem_only': 'REM_human_staging_human_apnea_ml_rswa.p',
+                       'save_path': Path('/content/gdrive/My Drive/').joinpath('RSWA_Predictions'),
+                       'name_of_staging': 'stage_dict.p',
+                       'path_to_staging': Path('/content/gdrive/My Drive/').joinpath('Data/raw_no_baseline_all'),
+                       'name_of_predictions_full': 'FULL_human_staging_human_apnea_ml_rswa.p'
+                       }]
+    
+    evaluate_pipeline(prediction_configurations = prediction_configurations,
+                      name_of_ground_truth_staging = 'stage_dict.p',
+                      path_to_ground_truth_staging = Path('/content/gdrive/My Drive/').joinpath('Data/raw_no_baseline_all'),
+                      name_of_ground_truth_apnea = 'ground_truth_apnea_dict.p',
+                      path_to_ground_truth_apnea = Path('/content/gdrive/My Drive/').joinpath('Apnea_Dicts'),
+                      path_to_p_files = Path('/content/gdrive/My Drive/').joinpath('Data/artifact_reduced_emg2'),
+                      save_path = Path('/content/gdrive/My Drive/').joinpath('RSWA_Predictions'),
+                      pipeline_results_save_name = 'full_pipeline_results.csv',
+                      metrics =  [balanced_accuracy_score],
+                  replace_files=True)
         
         
