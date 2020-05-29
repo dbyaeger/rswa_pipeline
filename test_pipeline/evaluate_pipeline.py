@@ -17,6 +17,7 @@ def evaluate_pipeline(prediction_configurations: list,
                       path_to_ground_truth_staging: str,
                       name_of_ground_truth_apnea: str,
                       path_to_ground_truth_apnea: str,
+                      path_to_ground_truth_rswa: str,
                       path_to_p_files: str,
                       save_path: str,
                       pipeline_results_save_name: str,
@@ -26,19 +27,20 @@ def evaluate_pipeline(prediction_configurations: list,
     # Create full-length targets if they don't exist
     if not isinstance(save_path, Path): save_path = Path(save_path)
     
-    if not save_path.joinpath('RSWA_ground_truth_full_targets.p').exists():
+    if not path_to_ground_truth_rswa.joinpath('RSWA_ground_truth_full_targets.p').exists():
         print('Generating full-length RSWA targets')
         generate_targets(name_of_ground_truth_staging,
                                        path_to_ground_truth_staging,
                                        name_of_ground_truth_apnea,
                                        path_to_ground_truth_apnea,
                                        path_to_p_files,
-                                       save_path)
+                                       path_to_ground_truth_rswa)
     
     # Generate full-length predictions
     prediction_files = []
     
     for config in prediction_configurations:
+        #print(config)
         prediction_files.append(config['name_of_predictions_full'])
         
         if not Path(config['save_path']).joinpath(config['name_of_predictions_rem_only']).exists() or replace_files:
@@ -71,7 +73,6 @@ if __name__ == "__main__":
     
     from sklearn.metrics import balanced_accuracy_score
     
-    # Set up paths and 
     model_path = Path('/content/gdrive/My Drive/').joinpath('Models')
     path_to_apneas = Path('/content/gdrive/My Drive/').joinpath('Apnea_Dicts')
     prediction_configurations = [
@@ -126,10 +127,10 @@ if __name__ == "__main__":
                       path_to_ground_truth_staging = Path('/content/gdrive/My Drive/').joinpath('Stage_Dicts'),
                       name_of_ground_truth_apnea = 'ground_truth_apnea_dict.p',
                       path_to_ground_truth_apnea = Path('/content/gdrive/My Drive/').joinpath('Apnea_Dicts'),
+                      path_to_ground_truth_rswa = Path('/content/gdrive/My Drive/').joinpath('RSWA_Predictions'),
                       path_to_p_files = Path('/content/gdrive/My Drive/').joinpath('Data/artifact_reduced_emg2'),
-                      save_path = Path('/content/gdrive/My Drive/').joinpath('RSWA_Predictions'),
+                      save_path = Path('/content/gdrive/My Drive/').joinpath('Pipeline_Results'),
                       pipeline_results_save_name = 'full_pipeline_results.csv',
                       metrics =  [balanced_accuracy_score],
-                      replace_files=True)
-        
+                      replace_files=False)
         
